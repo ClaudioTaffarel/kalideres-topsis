@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pemilihan Lokasi Gerai Minuman Teh – Kalideres</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+    />
+    <style>
+      :root {
+        --bg: #f6f5f1;
+        --card: #fff;
+        --ink: #1f2a24;
+        --mut: #6b756f;
+        --line: #dcdad2;
+        --ac: #2f6b4f;
+        --ac2: #e8f0ea;
+        --bad: #b4472f;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      header {
+        background: var(--ac);
+        color: #fff;
+        padding: 22px 5vw;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 650;
+      }
+      header p {
+        margin: 4px 0 0;
+        opacity: 0.85;
+        font-size: 0.9rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 390px 1fr;
+        gap: 16px;
+        padding: 16px 5vw;
+        align-items: start;
+      }
+      aside {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-height: 78vh;
+        overflow: auto;
+        padding-right: 4px;
+      }
+      section.c {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px 16px;
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+      }
+      h2 span {
+        display: inline-grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--ac);
+        color: #fff;
+        font-size: 0.78rem;
+        margin-right: 7px;
+      }
+      label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--mut);
+        margin: 8px 0 2px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 7px 9px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: inherit;
+        background: #fff;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: 0;
+        border-radius: 6px;
+        padding: 9px 14px;
+        background: var(--ac);
+        color: #fff;
+        font-weight: 600;
+      }
+      button.g {
+        background: var(--ac2);
+        color: var(--ac);
+      }
+      button.x {
+        background: none;
+        color: var(--bad);
+        padding: 2px 8px;
+      }
+      .note {
+        font-size: 0.8rem;
+        color: var(--mut);
+        margin: 6px 0 0;
+      }
+      .err {
+        color: var(--bad);
+      }
+      .pv {
+        background: var(--ac2);
+        border-radius: 6px;
+        padding: 8px 10px;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        display: none;
+      }
+      .pw {
+        display: grid;
+        grid-template-columns: 1fr 88px;
+        gap: 6px;
+        align-items: center;
+        margin: 5px 0;
+        font-size: 0.85rem;
+      }
+      .bar {
+        height: 6px;
+        background: var(--ac2);
+        border-radius: 3px;
+        margin-top: 8px;
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--ac);
+      }
+      #map {
+        height: 78vh;
+        min-height: 420px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+      }
+      .lg {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-size: 0.8rem;
+        color: var(--mut);
+        margin: 8px 2px 0;
+      }
+      .lg b {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .rk {
+        background: var(--ink);
+        color: #fff;
+        font: 700 11px/22px system-ui;
+        text-align: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 4px #0005;
+      }
+      .rk.n {
+        background: #c47a12;
+      }
+      #res {
+        padding: 0 5vw 24px;
+      }
+      #res .c {
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.85rem;
+        min-width: 820px;
+      }
+      th,
+      td {
+        padding: 7px 8px;
+        text-align: right;
+        border-bottom: 1px solid var(--line);
+        white-space: nowrap;
+      }
+      th {
+        font-size: 0.75rem;
+        color: var(--mut);
+        font-weight: 600;
+      }
+      th:nth-child(-n + 2),
+      td:nth-child(-n + 2) {
+        text-align: left;
+      }
+      tbody tr {
+        cursor: pointer;
+      }
+      tbody tr:hover {
+        background: #faf9f5;
+      }
+      tr.top {
+        background: var(--ac2);
+      }
+      td input {
+        width: 120px;
+        text-align: right;
+        padding: 4px 6px;
+      }
+      .hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      footer {
+        text-align: center;
+        color: var(--mut);
+        font-size: 0.85rem;
+        padding: 20px;
+        border-top: 1px solid var(--line);
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          max-height: none;
+        }
+        #map {
+          height: 60vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Pemilihan Lokasi Gerai Minuman Teh di Kecamatan Kalideres</h1>
+      <p>Sistem Informasi Geografis dan metode AHP–TOPSIS</p>
+    </header>
+    <div class="grid">
+      <aside>
+        <section class="c">
+          <h2><span>1</span>Tambah ruko</h2>
+          <label>Nama ruko</label
+          ><input id="nm" placeholder="mis. Ruko Pesing" />
+          <label>Harga sewa per tahun (Rp)</label
+          ><input id="rp" type="number" min="0" placeholder="85000000" />
+          <div class="two">
+            <div>
+              <label>Lintang</label><input id="la" type="number" step="any" />
+            </div>
+            <div>
+              <label>Bujur</label><input id="lo" type="number" step="any" />
+            </div>
+          </div>
+          <p class="note">
+            Klik titik pada peta untuk mengisi koordinat. Lokasi harus berada di
+            dalam Kalideres.
+          </p>
+          <div class="pv" id="pv"></div>
+          <p class="note err" id="er"></p>
+          <button id="add" style="margin-top: 8px; width: 100%">
+            Simpan ruko
+          </button>
+        </section>
+        <section class="c">
+          <h2><span>2</span>Bobot kriteria (AHP)</h2>
+          <div id="ahp"></div>
+          <p class="note">
+            Nilai &gt;1: kriteria kiri lebih penting; &lt;1: kriteria kanan
+            lebih penting.
+          </p>
+          <div id="wt"></div>
+          <p class="note" id="cr"></p>
+        </section>
+        <button id="go" style="padding: 12px">Hitung Rekomendasi</button>
+      </aside>
+      <div>
+        <div id="map"></div>
+        <div class="lg">
+          <span
+            ><b style="background: #2f6b4f; border-radius: 2px"></b>Ruko
+            awal</span
+          ><span
+            ><b style="background: #c47a12; border-radius: 2px"></b>Ruko
+            tambahan</span
+          ><span><b style="background: #2b6cb0"></b>Sekolah</span
+          ><span><b style="background: #c0392b"></b>Kompetitor</span
+          ><span>Lingkaran: radius 800 m</span>
+        </div>
+      </div>
+    </div>
+    <div id="res">
+      <section class="c">
+        <div class="hd">
+          <h2 style="margin: 0">Alternatif dan hasil TOPSIS</h2>
+          <span
+            ><button class="g" id="rs" style="display: none; padding: 5px 10px">
+              Pulihkan ruko awal
+            </button>
+            <span class="note" id="ms"></span
+          ></span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Ruko</th>
+              <th>Sewa / tahun (Rp)</th>
+              <th>Σ sekolah 800 m</th>
+              <th>Jarak sekolah (m)</th>
+              <th>Σ kompetitor 800 m</th>
+              <th>Jarak kompetitor (m)</th>
+              <th>D⁺</th>
+              <th>D⁻</th>
+              <th>Nilai Ci</th>
+              <th>Peringkat</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+        <p class="note">
+          Jenis kriteria: sewa (cost), Σ sekolah (benefit), jarak sekolah
+          (cost), Σ kompetitor (cost), jarak kompetitor (benefit). Data sekolah
+          dan kompetitor statis dari dataset penelitian.
+        </p>
+      </section>
+    </div>
+    <footer>
+      Kelompok: Claudio Taffarel Santoso (535240035) · Devin Giovano (535240057)
+      · Excell Hanzovin Hakim (535240085)
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.2/proj4.js"></script>
+    <script>
+      // RADIUS_HITUNG = radius efektif buffer QGIS (3278) di lapangan ±727 m; ganti ke 800 untuk radius 800 m sebenarnya.
+      const D = {
+          ruko: [
+            [106.7184, -6.12373],
+            [106.70423, -6.12754],
+            [106.70863, -6.13153],
+            [106.70989, -6.13663],
+            [106.69221, -6.1285],
+            [106.71172, -6.12581],
+            [106.70776, -6.13231],
+            [106.70032, -6.14716],
+          ],
+          sek: [
+            [106.72231, -6.12252],
+            [106.70279, -6.15524],
+            [106.69537, -6.14413],
+            [106.70077, -6.12629],
+            [106.70226, -6.13564],
+            [106.71384, -6.13847],
+            [106.7036, -6.12207],
+            [106.69712, -6.14978],
+            [106.70238, -6.13961],
+            [106.70476, -6.15275],
+            [106.69582, -6.13874],
+            [106.69688, -6.15578],
+            [106.70034, -6.13476],
+            [106.70635, -6.14387],
+            [106.70485, -6.14547],
+            [106.70428, -6.15415],
+            [106.70311, -6.1485],
+            [106.69247, -6.13621],
+            [106.70269, -6.13882],
+            [106.6962, -6.14112],
+            [106.7138, -6.1442],
+            [106.69598, -6.14232],
+            [106.71255, -6.11374],
+            [106.71332, -6.11782],
+            [106.71519, -6.12397],
+            [106.71051, -6.10445],
+            [106.7054, -6.13476],
+            [106.70307, -6.11744],
+            [106.71727, -6.1428],
+            [106.69666, -6.14851],
+            [106.7134, -6.14409],
+            [106.69127, -6.15184],
+            [106.69727, -6.17158],
+            [106.70719, -6.17012],
+            [106.70129, -6.13952],
+            [106.70217, -6.14307],
+            [106.72315, -6.12504],
+            [106.70512, -6.15268],
+            [106.72034, -6.11945],
+            [106.70212, -6.16727],
+            [106.70447, -6.14481],
+            [106.70338, -6.12583],
+            [106.69377, -6.15021],
+            [106.70758, -6.12949],
+            [106.70174, -6.14651],
+            [106.70751, -6.14734],
+          ],
+          kom: [
+            [106.71042, -6.10491],
+            [106.69266, -6.12439],
+            [106.6929, -6.12435],
+            [106.69378, -6.12377],
+            [106.69412, -6.12359],
+            [106.71742, -6.12259],
+            [106.71891, -6.12436],
+            [106.71939, -6.12494],
+            [106.7193, -6.12517],
+            [106.69371, -6.13293],
+            [106.7031, -6.13376],
+            [106.70928, -6.13202],
+            [106.70957, -6.13229],
+            [106.70045, -6.14527],
+            [106.7009, -6.14576],
+            [106.70085, -6.14612],
+            [106.70037, -6.14587],
+            [106.71706, -6.13285],
+            [106.71286, -6.12629],
+            [106.70252, -6.14899],
+            [106.70889, -6.14687],
+            [106.71366, -6.14809],
+            [106.71424, -6.15051],
+            [106.71409, -6.1522],
+            [106.71519, -6.15159],
+          ],
+          bd: [
+            [
+              [
+                [106.69204, -6.17459],
+                [106.69233, -6.17373],
+                [106.68823, -6.17249],
+                [106.68825, -6.1682],
+                [106.68876, -6.16699],
+                [106.68925, -6.16702],
+                [106.68884, -6.16537],
+                [106.68931, -6.16451],
+                [106.68908, -6.16346],
+                [106.68931, -6.16181],
+                [106.69007, -6.15995],
+                [106.6881, -6.15989],
+                [106.68791, -6.15434],
+                [106.68747, -6.15412],
+                [106.68777, -6.1532],
+                [106.68745, -6.14759],
+                [106.68697, -6.14742],
+                [106.68633, -6.14402],
+                [106.68655, -6.13485],
+                [106.68559, -6.12039],
+                [106.68564, -6.11583],
+                [106.68625, -6.11499],
+                [106.68719, -6.11466],
+                [106.6945, -6.11279],
+                [106.69587, -6.11293],
+                [106.69579, -6.11215],
+                [106.69684, -6.11082],
+                [106.69626, -6.1097],
+                [106.69473, -6.10977],
+                [106.69389, -6.10933],
+                [106.69358, -6.10823],
+                [106.69423, -6.10698],
+                [106.69403, -6.10662],
+                [106.69297, -6.10645],
+                [106.69144, -6.10721],
+                [106.6912, -6.10897],
+                [106.68921, -6.1086],
+                [106.68848, -6.10705],
+                [106.68851, -6.10543],
+                [106.68894, -6.10477],
+                [106.68852, -6.10404],
+                [106.68863, -6.10276],
+                [106.6892, -6.10139],
+                [106.68915, -6.1003],
+                [106.68855, -6.10012],
+                [106.68802, -6.09815],
+                [106.68736, -6.0971],
+                [106.69061, -6.0964],
+                [106.69184, -6.09577],
+                [106.69456, -6.09564],
+                [106.69576, -6.0962],
+                [106.69626, -6.09587],
+                [106.69739, -6.09663],
+                [106.70005, -6.09594],
+                [106.70198, -6.09627],
+                [106.70421, -6.09591],
+                [106.70444, -6.09637],
+                [106.7079, -6.09604],
+                [106.71083, -6.09643],
+                [106.71102, -6.09678],
+                [106.71209, -6.09635],
+                [106.71413, -6.09616],
+                [106.71254, -6.09685],
+                [106.71428, -6.09885],
+                [106.71656, -6.10328],
+                [106.72247, -6.11143],
+                [106.72687, -6.11684],
+                [106.73155, -6.12154],
+                [106.73059, -6.12334],
+                [106.72984, -6.12271],
+                [106.7286, -6.12326],
+                [106.7286, -6.12372],
+                [106.72719, -6.12382],
+                [106.72439, -6.12634],
+                [106.72342, -6.12597],
+                [106.7225, -6.12607],
+                [106.72161, -6.12689],
+                [106.72048, -6.12679],
+                [106.71901, -6.12858],
+                [106.71922, -6.12888],
+                [106.71874, -6.12944],
+                [106.71661, -6.13101],
+                [106.71786, -6.13242],
+                [106.71661, -6.13358],
+                [106.71664, -6.13861],
+                [106.71748, -6.14324],
+                [106.71846, -6.14349],
+                [106.71782, -6.14532],
+                [106.71891, -6.15334],
+                [106.71564, -6.15509],
+                [106.716, -6.15633],
+                [106.71555, -6.15662],
+                [106.71588, -6.15769],
+                [106.71514, -6.15778],
+                [106.71535, -6.16242],
+                [106.71675, -6.16243],
+                [106.7165, -6.16385],
+                [106.71671, -6.16558],
+                [106.71649, -6.16607],
+                [106.71376, -6.16787],
+                [106.7125, -6.17163],
+                [106.71181, -6.17182],
+                [106.71121, -6.17259],
+                [106.71066, -6.17438],
+                [106.70687, -6.17422],
+                [106.7069, -6.1768],
+                [106.7037, -6.17859],
+                [106.70104, -6.17655],
+                [106.69877, -6.17623],
+                [106.69577, -6.17515],
+                [106.69402, -6.17588],
+                [106.69343, -6.17523],
+                [106.69204, -6.17459],
+              ],
+            ],
+          ],
+        },
+        R = 727,
+        $ = (s) => document.querySelector(s),
+        f = (n) => Math.round(n).toLocaleString("id-ID");
+      const C = [
+        ["Harga sewa", "cost"],
+        ["Jumlah sekolah", "benefit"],
+        ["Jarak sekolah", "cost"],
+        ["Jumlah kompetitor", "cost"],
+        ["Jarak kompetitor", "benefit"],
+      ];
+      proj4.defs(
+        "K",
+        "+proj=utm +zone=48 +south +datum=WGS84 +units=m +no_defs",
+      );
+      const pr = (ll) => proj4("EPSG:4326", "K", ll),
+        inv = (xy) => proj4("K", "EPSG:4326", xy),
+        S = D.sek.map(pr),
+        K = D.kom.map(pr);
+      function calc(ll) {
+        const p = pr(ll),
+          g = (A) => {
+            const d = A.map((q) => Math.hypot(q[0] - p[0], q[1] - p[1]));
+            return [d.filter((x) => x <= R).length, Math.min(...d)];
+          };
+        const [a, b] = g(S),
+          [c, e] = g(K);
+        return { ns: a, ds: b, nk: c, dk: e };
+      }
+      const ring = (ll) => {
+        const p = pr(ll);
+        return Array.from({ length: 72 }, (_, i) => {
+          const t = (i * Math.PI) / 36,
+            q = inv([p[0] + R * Math.cos(t), p[1] + R * Math.sin(t)]);
+          return [q[1], q[0]];
+        });
+      };
+      const pip = (x, y, r) => {
+        let c = false;
+        for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+          const a = r[i],
+            b = r[j];
+          if (
+            a[1] > y != b[1] > y &&
+            x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]
+          )
+            c = !c;
+        }
+        return c;
+      };
+      const inside = (ll) =>
+        D.bd.some(
+          (P) =>
+            pip(ll[0], ll[1], P[0]) &&
+            !P.slice(1).some((h) => pip(ll[0], ll[1], h)),
+        );
+      const ls = {
+        get(k, d) {
+          try {
+            return JSON.parse(localStorage.getItem(k)) ?? d;
+          } catch (e) {
+            return d;
+          }
+        },
+        set(k, v) {
+          try {
+            localStorage.setItem(k, JSON.stringify(v));
+          } catch (e) {}
+        },
+      };
+      const META = [
+        { n: "Ruko Menceng Raya No. 1A", r: 85000000 },
+        { n: "CBD Palem dekat Lotte Mart", r: 70000000 },
+        { n: "Permata Taman Palem ukuran 4 x 12 m", r: 75000000 },
+        { n: "Ruko Taman Surya 5 ukuran 4,5 x 17 m", r: 85000000 },
+        { n: "Sunset Junction Citra 8 H-01A No. 05", r: 105000000 },
+        { n: "Ruko Citra 6 ukuran 4 x 15 m", r: 165000000 },
+        { n: "Ruko Jl. 20 Desember", r: 45000000 },
+        { n: "Ruko Citra 7 ukuran 4 x 15 m", r: 75000000 },
+      ];
+      let custom = ls.get("rb", []),
+        sewa = ls.get("sw", {}),
+        dele = ls.get("dl", []),
+        res = null,
+        pend = null,
+        mk = {},
+        ringL = null;
+      const map = L.map("map").setView([-6.137, 106.708], 13);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap",
+      }).addTo(map);
+      D.bd.forEach((P) =>
+        L.polygon(
+          P.map((r) => r.map((q) => [q[1], q[0]])),
+          {
+            color: "#2f6b4f",
+            weight: 1.5,
+            dashArray: "5 4",
+            fillOpacity: 0.04,
+          },
+        ).addTo(map),
+      );
+      map.fitBounds(L.latLngBounds(D.bd[0][0].map((q) => [q[1], q[0]])));
+      D.sek.forEach((q) =>
+        L.circleMarker([q[1], q[0]], {
+          radius: 4,
+          color: "#fff",
+          weight: 1,
+          fillColor: "#2b6cb0",
+          fillOpacity: 0.95,
+        })
+          .bindTooltip("Sekolah")
+          .addTo(map),
+      );
+      D.kom.forEach((q) =>
+        L.circleMarker([q[1], q[0]], {
+          radius: 4,
+          color: "#fff",
+          weight: 1,
+          fillColor: "#c0392b",
+          fillOpacity: 0.95,
+        })
+          .bindTooltip("Kompetitor")
+          .addTo(map),
+      );
+      D.ruko.forEach((_, i) => {
+        sewa["r" + (i + 1)] = META[i].r;
+      });
+      const alts = () =>
+        [
+          ...D.ruko
+            .map((ll, i) => ({
+              id: "r" + (i + 1),
+              name: META[i].n,
+              ll,
+              no: i + 1,
+            }))
+            .filter((a) => !dele.includes(a.id)),
+          ...custom.map((c, i) => ({ ...c, no: D.ruko.length + i + 1, cu: 1 })),
+        ].map((a) => ({ ...a, c: calc(a.ll) }));
+      function drawMk() {
+        Object.values(mk).forEach((m) => m.remove());
+        mk = {};
+        alts().forEach((a) => {
+          mk[a.id] = L.marker([a.ll[1], a.ll[0]], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div class="rk${a.cu ? " n" : ""}">${a.no}</div>`,
+              iconSize: [22, 22],
+            }),
+          })
+            .bindTooltip(a.name)
+            .addTo(map)
+            .on("click", () => show(a.id));
+        });
+      }
+      function show(id) {
+        const a = alts().find((x) => x.id == id);
+        if (!a) return;
+        if (ringL) ringL.remove();
+        ringL = L.polygon(ring(a.ll), {
+          color: "#c47a12",
+          weight: 2,
+          fillOpacity: 0.08,
+        }).addTo(map);
+        map.fitBounds(ringL.getBounds().pad(0.3));
+      }
+      function setPt(lat, lon) {
+        $("#la").value = (+lat).toFixed(6);
+        $("#lo").value = (+lon).toFixed(6);
+        prev();
+      }
+      function prev() {
+        const la = +$("#la").value,
+          lo = +$("#lo").value,
+          pv = $("#pv"),
+          er = $("#er");
+        er.textContent = "";
+        if (!$("#la").value || !$("#lo").value) {
+          pv.style.display = "none";
+          return false;
+        }
+        if (!inside([lo, la])) {
+          pv.style.display = "none";
+          er.textContent = "Titik di luar wilayah Kalideres.";
+          return false;
+        }
+        const c = calc([lo, la]);
+        pv.style.display = "block";
+        pv.innerHTML = `Σ sekolah: <b>${c.ns}</b> · sekolah terdekat: <b>${f(c.ds)} m</b><br>Σ kompetitor: <b>${c.nk}</b> · kompetitor terdekat: <b>${f(c.dk)} m</b>`;
+        if (pend) pend.remove();
+        pend = L.circleMarker([la, lo], {
+          radius: 7,
+          color: "#c47a12",
+          fillOpacity: 0.5,
+        }).addTo(map);
+        return true;
+      }
+      map.on("click", (e) => setPt(e.latlng.lat, e.latlng.lng));
+      $("#la").oninput = $("#lo").oninput = prev;
+      $("#add").onclick = () => {
+        const n = $("#nm").value.trim(),
+          r = +$("#rp").value;
+        if (!prev()) {
+          if (!$("#er").textContent)
+            $("#er").textContent = "Pilih titik pada peta.";
+          return;
+        }
+        if (!n || !(r > 0)) {
+          $("#er").textContent = "Isi nama dan harga sewa.";
+          return;
+        }
+        const id = "c" + Date.now();
+        custom.push({ id, name: n, ll: [+$("#lo").value, +$("#la").value] });
+        sewa[id] = r;
+        ls.set("rb", custom);
+        ls.set("sw", sewa);
+        ["nm", "rp", "la", "lo"].forEach((i) => ($("#" + i).value = ""));
+        $("#pv").style.display = "none";
+        if (pend) pend.remove();
+        res = null;
+        drawMk();
+        render();
+        show(id);
+      };
+      const A5 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        pairs = [];
+      for (let i = 0; i < 5; i++)
+        for (let j = i + 1; j < 5; j++) pairs.push([i, j]);
+      const OP = [
+        ["9", 9],
+        ["7", 7],
+        ["5", 5],
+        ["3", 3],
+        ["1 (sama)", 1],
+        ["1/3", 1 / 3],
+        ["1/5", 1 / 5],
+        ["1/7", 1 / 7],
+        ["1/9", 1 / 9],
+      ];
+      $("#ahp").innerHTML = pairs
+        .map(
+          (p, k) =>
+            `<div class="pw"><span>${C[p[0]][0]} <small>vs</small> ${C[p[1]][0]}</small></span><select data-k="${k}">${OP.map((o) => `<option value="${o[1]}"${o[1] == 1 ? " selected" : ""}>${o[0]}</option>`).join("")}</select></div>`,
+        )
+        .join("");
+      document.querySelectorAll("#ahp select").forEach(
+        (s) =>
+          (s.onchange = () => {
+            A5[s.dataset.k] = +s.value;
+            res = null;
+            weights();
+            render();
+          }),
+      );
+      function weights() {
+        const M = Array.from({ length: 5 }, () => Array(5).fill(1));
+        pairs.forEach(([i, j], k) => {
+          M[i][j] = A5[k];
+          M[j][i] = 1 / A5[k];
+        });
+        const g = M.map((r) =>
+            Math.pow(
+              r.reduce((a, b) => a * b, 1),
+              0.2,
+            ),
+          ),
+          t = g.reduce((a, b) => a + b),
+          w = g.map((x) => x / t);
+        const lam =
+            M.reduce(
+              (s, r, i) => s + r.reduce((a, b, j) => a + b * w[j], 0) / w[i],
+              0,
+            ) / 5,
+          cr = (lam - 5) / 4 / 1.12;
+        $("#wt").innerHTML = C.map(
+          (c, i) =>
+            `<div style="font-size:.82rem;margin-top:6px">${c[0]} <b style="float:right">${(w[i] * 100).toFixed(1)}%</b><div class="bar" style="margin-top:2px"><i style="width:${w[i] * 100}%"></i></div></div>`,
+        ).join("");
+        $("#cr").innerHTML =
+          `Consistency Ratio: <b>${cr.toFixed(3)}</b> ${cr <= 0.1 ? "(konsisten)" : '<span class="err">(belum konsisten, sebaiknya ≤ 0,1)</span>'}`;
+        return w;
+      }
+      function topsis() {
+        const a = alts(),
+          ms = $("#ms");
+        if (a.length < 2) {
+          ms.className = "note err";
+          ms.textContent = "Minimal 2 ruko untuk dihitung.";
+          return;
+        }
+        if (a.some((x) => !(sewa[x.id] > 0))) {
+          ms.className = "note err";
+          ms.textContent = "Isi harga sewa semua ruko terlebih dahulu.";
+          return;
+        }
+        ms.className = "note";
+        ms.textContent = "";
+        const w = weights(),
+          V = a.map((x) => [sewa[x.id], x.c.ns, x.c.ds, x.c.nk, x.c.dk]);
+        const den = [0, 1, 2, 3, 4].map(
+            (j) => Math.sqrt(V.reduce((s, v) => s + v[j] ** 2, 0)) || 1,
+          ),
+          Y = V.map((v) => v.map((x, j) => (w[j] * x) / den[j]));
+        const bs = [],
+          ws = [];
+        C.forEach((c, j) => {
+          const col = Y.map((y) => y[j]),
+            mx = Math.max(...col),
+            mn = Math.min(...col);
+          bs.push(c[1] == "benefit" ? mx : mn);
+          ws.push(c[1] == "benefit" ? mn : mx);
+        });
+        res = {};
+        const o = a.map((x, i) => {
+          const dp = Math.sqrt(
+              Y[i].reduce((s, y, j) => s + (y - bs[j]) ** 2, 0),
+            ),
+            dn = Math.sqrt(Y[i].reduce((s, y, j) => s + (y - ws[j]) ** 2, 0)),
+            ci = dp + dn ? dn / (dp + dn) : 0;
+          return { id: x.id, dp, dn, ci };
+        });
+        o.slice()
+          .sort((p, q) => q.ci - p.ci)
+          .forEach((r, i) => {
+            res[r.id] = { ...r, rk: i + 1 };
+          });
+        render();
+      }
+      function render() {
+        let a = alts();
+        if (res && a.every((x) => res[x.id]))
+          a.sort((p, q) => res[p.id].rk - res[q.id].rk);
+        $("#tb").innerHTML = a
+          .map((x) => {
+            const r = res && res[x.id];
+            return `<tr class="${r && r.rk == 1 ? "top" : ""}" data-id="${x.id}"><td><b>${x.no}.</b> ${x.name}</td><td>${f(sewa[x.id])}</td><td>${x.c.ns}</td><td>${f(x.c.ds)}</td><td>${x.c.nk}</td><td>${f(x.c.dk)}</td><td>${r ? r.dp.toFixed(4) : "–"}</td><td>${r ? r.dn.toFixed(4) : "–"}</td><td>${r ? r.ci.toFixed(4) : "–"}</td><td><b>${r ? r.rk : "–"}</b></td><td><button class="x" data-d="${x.id}" title="Hapus">✕</button></td></tr>`;
+          })
+          .join("");
+        document.querySelectorAll("#tb tr").forEach(
+          (t) =>
+            (t.onclick = (e) => {
+              if (e.target.closest("input,button")) return;
+              show(t.dataset.id);
+            }),
+        );
+        document.querySelectorAll("[data-d]").forEach(
+          (b) =>
+            (b.onclick = () => {
+              const id = b.dataset.d;
+              if (id[0] == "r") {
+                dele.push(id);
+                ls.set("dl", dele);
+              } else {
+                custom = custom.filter((c) => c.id != id);
+                delete sewa[id];
+                ls.set("rb", custom);
+                ls.set("sw", sewa);
+              }
+              res = null;
+              if (ringL) {
+                ringL.remove();
+                ringL = null;
+              }
+              drawMk();
+              render();
+            }),
+        );
+        $("#rs").style.display = dele.length ? "" : "none";
+      }
+      $("#rs").onclick = () => {
+        dele = [];
+        ls.set("dl", dele);
+        res = null;
+        drawMk();
+        render();
+      };
+      $("#go").onclick = () => {
+        topsis();
+        $("#res").scrollIntoView({ behavior: "smooth" });
+      };
+      weights();
+      drawMk();
+      render();
+    </script>
+  </body>
+</html>
